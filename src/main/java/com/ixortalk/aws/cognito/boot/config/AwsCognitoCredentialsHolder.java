@@ -23,12 +23,6 @@
  */
 package com.ixortalk.aws.cognito.boot.config;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
-
-@Component
-@Scope(value="request", proxyMode= ScopedProxyMode.TARGET_CLASS)
 public class AwsCognitoCredentialsHolder {
 
     public String getIdToken() {

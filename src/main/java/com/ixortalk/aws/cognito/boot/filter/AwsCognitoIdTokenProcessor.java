@@ -23,39 +23,25 @@
  */
 package com.ixortalk.aws.cognito.boot.filter;
 
-import com.nimbusds.jose.jwk.source.JWKSource;
-import com.nimbusds.jose.jwk.source.RemoteJWKSet;
-import com.nimbusds.jose.proc.JWSKeySelector;
-import com.nimbusds.jose.proc.JWSVerificationKeySelector;
-import com.nimbusds.jose.util.DefaultResourceRetriever;
-import com.nimbusds.jose.util.ResourceRetriever;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.ixortalk.aws.cognito.boot.config.AwsCognitoCredentialsHolder;
 import com.ixortalk.aws.cognito.boot.config.AwsCognitoJtwConfiguration;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.nimbusds.jose.JWSAlgorithm.RS256;
-
-@Component
 public class AwsCognitoIdTokenProcessor {
 
     protected final Log logger = LogFactory.getLog(getClass());
@@ -108,17 +94,6 @@ public class AwsCognitoIdTokenProcessor {
             }
         }
         return null;
-    }
-
-    @Bean
-    private ConfigurableJWTProcessor jwtProcessor() throws MalformedURLException {
-        ResourceRetriever resourceRetriever = new DefaultResourceRetriever(awsCognitoJtwConfiguration.getConnectionTimeout(), awsCognitoJtwConfiguration.getReadTimeout());
-        URL jwkSetURL = new URL(awsCognitoJtwConfiguration.getJwkUrl());
-        JWKSource keySource = new RemoteJWKSet(jwkSetURL, resourceRetriever);
-        ConfigurableJWTProcessor jwtProcessor = new DefaultJWTProcessor();
-        JWSKeySelector keySelector = new JWSVerificationKeySelector(RS256, keySource);
-        jwtProcessor.setJWSKeySelector(keySelector);
-        return jwtProcessor;
     }
 
     public static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
