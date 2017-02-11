@@ -23,6 +23,8 @@
  */
 package com.ixortalk.aws.cognito.boot.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
@@ -36,6 +38,8 @@ import java.io.IOException;
 
 public class AwsCognitoJwtAuthenticationFilter extends GenericFilterBean {
 
+    private static final Logger logger = LoggerFactory.getLogger(AwsCognitoJwtAuthenticationFilter.class);
+
 
     private AwsCognitoIdTokenProcessor awsCognitoIdTokenProcessor;
 
@@ -45,9 +49,18 @@ public class AwsCognitoJwtAuthenticationFilter extends GenericFilterBean {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        Authentication authentication = awsCognitoIdTokenProcessor.getAuthentication((HttpServletRequest)request);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        filterChain.doFilter(request,response);
+        try {
+
+            Authentication authentication = awsCognitoIdTokenProcessor.getAuthentication((HttpServletRequest)request);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            filterChain.doFilter(request,response);
+
+        } catch (Exception e) {
+            logger.error("Error occured while processing Cognito ID Token",e);
+            throw new ServletException("Error occured while processing Cognito ID Token",e);
+        }
+
+
     }
 }

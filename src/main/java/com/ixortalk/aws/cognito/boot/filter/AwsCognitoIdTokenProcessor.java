@@ -25,6 +25,8 @@ package com.ixortalk.aws.cognito.boot.filter;
 
 import com.ixortalk.aws.cognito.boot.config.AwsCognitoCredentialsHolder;
 import com.ixortalk.aws.cognito.boot.config.AwsCognitoJtwConfiguration;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import org.apache.commons.logging.Log;
@@ -37,7 +39,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -57,21 +59,22 @@ public class AwsCognitoIdTokenProcessor {
     @Autowired
     private AwsCognitoCredentialsHolder awsCognitoCredentialsHolder;
 
-    public Authentication getAuthentication(HttpServletRequest request) throws IOException {
+    public Authentication getAuthentication(HttpServletRequest request) throws Exception {
 
         String idToken = request.getHeader(awsCognitoJtwConfiguration.getHttpHeader());
         if (idToken != null) {
 
+            JWTClaimsSet claimsSet = null;
             try {
 
-                JWTClaimsSet claimsSet = jwtProcessor.process(idToken, null);
+                claimsSet = jwtProcessor.process(idToken, null);
 
                 if (!claimsSet.getIssuer().equals(awsCognitoJtwConfiguration.getCognitoIdentityPoolUrl())) {
-                    throw new Exception(String.format("Issuer %s in JWT token doesn't match cognito idp %s",claimsSet.getIssuer(), awsCognitoJtwConfiguration.getCognitoIdentityPoolUrl()));
+                    throw new Exception(String.format("Issuer %s in JWT token doesn't match cognito idp %s", claimsSet.getIssuer(), awsCognitoJtwConfiguration.getCognitoIdentityPoolUrl()));
                 }
 
                 if (!claimsSet.getClaim("token_use").equals("id")) {
-                    throw new Exception(String.format("JWT Token doesn't seem to be an ID Token"));
+                    throw new Exception("JWT Token doesn't seem to be an ID Token");
                 }
 
                 String username = claimsSet.getClaims().get(awsCognitoJtwConfiguration.getUserNameField()).toString();
@@ -89,9 +92,15 @@ public class AwsCognitoIdTokenProcessor {
                     return usernamePasswordAuthenticationToken;
                 }
 
-            } catch (Exception ex) {
-                logger.error("Error while processing JWT token",ex);
+
+            } catch (ParseException e) {
+                logger.error("Error parsing JWT Token",e);
+            } catch (BadJOSEException e) {
+                logger.error("JWT Token Signing and Encryption error",e);
+            } catch (JOSEException e) {
+                logger.error("JWT Token Signing and Encryption error",e);
             }
+
         }
         return null;
     }
