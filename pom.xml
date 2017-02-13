@@ -135,12 +135,6 @@
             <version>4.2.0.RELEASE</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.ixortalk</groupId>
-            <artifactId>ixortalk.aws.cognito.jwt.security.filter.test</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
 
     <build>
