@@ -50,17 +50,20 @@ public class AwsCognitoJwtAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 
+        Authentication authentication = null;
         try {
+            authentication = awsCognitoIdTokenProcessor.getAuthentication((HttpServletRequest)request);
 
-            Authentication authentication = awsCognitoIdTokenProcessor.getAuthentication((HttpServletRequest)request);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            filterChain.doFilter(request,response);
+            if (authentication!=null) {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
 
         } catch (Exception e) {
             logger.error("Error occured while processing Cognito ID Token",e);
             throw new ServletException("Error occured while processing Cognito ID Token",e);
         }
 
+        filterChain.doFilter(request,response);
 
     }
 }

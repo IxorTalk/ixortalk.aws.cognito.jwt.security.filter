@@ -23,6 +23,7 @@
  */
 package com.ixortalk.aws.cognito.boot.filter;
 
+import com.ixortalk.aws.cognito.boot.JwtAuthentication;
 import com.ixortalk.aws.cognito.boot.config.AwsCognitoCredentialsHolder;
 import com.ixortalk.aws.cognito.boot.config.AwsCognitoJtwConfiguration;
 import com.nimbusds.jose.JOSEException;
@@ -32,7 +33,6 @@ import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -85,11 +85,8 @@ public class AwsCognitoIdTokenProcessor {
                     List<GrantedAuthority> grantedAuthorities = convertList(cognitoGroups, group -> new SimpleGrantedAuthority("ROLE_" + group.toUpperCase()));
                     User user = new User(username, EMPTY_PWD, grantedAuthorities);
 
-                    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, EMPTY_PWD, grantedAuthorities);
-                    usernamePasswordAuthenticationToken.setDetails(claimsSet.getClaims());
-
                     awsCognitoCredentialsHolder.setIdToken(idToken);
-                    return usernamePasswordAuthenticationToken;
+                    return new JwtAuthentication(user,claimsSet,grantedAuthorities);
                 }
 
 
@@ -102,6 +99,8 @@ public class AwsCognitoIdTokenProcessor {
             }
 
         }
+
+        logger.warn("No idToken found in HTTP Header");
         return null;
     }
 
