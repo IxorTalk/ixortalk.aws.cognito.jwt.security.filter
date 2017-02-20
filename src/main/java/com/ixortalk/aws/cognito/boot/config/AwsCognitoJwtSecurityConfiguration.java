@@ -67,10 +67,13 @@ public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAda
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.headers().cacheControl();
-		http.csrf().disable()
+		http
 				.authorizeRequests()
 				.antMatchers("/health").permitAll()
+				.antMatchers("/v2/**").permitAll()
+				.antMatchers("/docs/**").permitAll()
+				.antMatchers("/api/**").authenticated()
+				.antMatchers("/**").permitAll() // needs to be the last matcher, otherwise all matchers following it would never be reached
 				.anyRequest().authenticated()
 				.and()
 				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
