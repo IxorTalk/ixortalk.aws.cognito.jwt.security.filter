@@ -37,10 +37,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAdapter implements Ordered {
 
-	private int order = 1;
+	private int order = 4;
 
 	@Autowired
-	private AwsCognitoJwtAuthenticationFilter awsCognitoJwtAuthenticationFilter;
+	private ApplicationContext context;
+
+	@Autowired
+	private AwsCognitoIdTokenProcessor awsCognitoIdTokenProcessor;
+
+	@Autowired
+	private AwsCognitoJtwConfiguration awsCognitoJtwConfiguration;
+
+	@Autowired
+	private JwtAuthenticationProvider jwtAuthenticationProvider;
 
 	@Override
 	public int getOrder() {
@@ -51,20 +60,25 @@ public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAda
 		this.order = order;
 	}
 
-	//TODO: These matchers should be app specific and should not be in the library
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		auth.authenticationProvider(jwtAuthenticationProvider);
+	}
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http
+		http.headers().cacheControl();
+		http.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/health").permitAll()
-				.antMatchers("/v2/**").permitAll()
-				.antMatchers("/docs/**").permitAll()
-				.antMatchers("/api/**").authenticated()
-				.antMatchers("/**").permitAll() // needs to be the last matcher, otherwise all matchers following it would never be reached
 				.anyRequest().authenticated()
 				.and()
-				.addFilterBefore(awsCognitoJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+	}
+
+	private AwsCognitoJwtAuthenticationFilter jwtAuthenticationFilter() {
+
+		return new AwsCognitoJwtAuthenticationFilter(awsCognitoIdTokenProcessor);
 	}
 
 }
