@@ -45,7 +45,7 @@ public class AwsCognitoJtwConfiguration {
     private String httpHeader = "Authorization";
 
     public String getJwkUrl() {
-        if (jwkUrl==null) {
+        if (jwkUrl==null || jwkUrl.isEmpty()) {
             return String.format(COGNITO_IDENTITY_POOL_URL + JSON_WEB_TOKEN_SET_URL_SUFFIX,region,userPoolId);
         }
         return jwkUrl;

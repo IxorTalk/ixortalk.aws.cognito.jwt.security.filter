@@ -23,7 +23,6 @@
  */
 package com.ixortalk.aws.cognito.boot.config;
 
-import com.ixortalk.aws.cognito.boot.JwtAuthentication;
 import com.ixortalk.aws.cognito.boot.filter.AwsCognitoIdTokenProcessor;
 import com.ixortalk.aws.cognito.boot.filter.AwsCognitoJwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,19 +37,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAdapter implements Ordered {
 
-	private int order = 4;
+	private int order = 1;
 
 	@Autowired
-	private ApplicationContext context;
-
-	@Autowired
-	private AwsCognitoIdTokenProcessor awsCognitoIdTokenProcessor;
-
-	@Autowired
-	private AwsCognitoJtwConfiguration awsCognitoJtwConfiguration;
-
-	@Autowired
-	private JwtAuthenticationProvider jwtAuthenticationProvider;
+	private AwsCognitoJwtAuthenticationFilter awsCognitoJwtAuthenticationFilter;
 
 	@Override
 	public int getOrder() {
@@ -61,25 +51,20 @@ public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAda
 		this.order = order;
 	}
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(jwtAuthenticationProvider);
-	}
+	//TODO: These matchers should be app specific and should not be in the library
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http.headers().cacheControl();
-		http.csrf().disable()
+		http
 				.authorizeRequests()
 				.antMatchers("/health").permitAll()
+				.antMatchers("/v2/**").permitAll()
+				.antMatchers("/docs/**").permitAll()
+				.antMatchers("/api/**").authenticated()
+				.antMatchers("/**").permitAll() // needs to be the last matcher, otherwise all matchers following it would never be reached
 				.anyRequest().authenticated()
 				.and()
-				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-	}
-
-	private AwsCognitoJwtAuthenticationFilter jwtAuthenticationFilter() {
-
-		return new AwsCognitoJwtAuthenticationFilter(awsCognitoIdTokenProcessor);
+				.addFilterBefore(awsCognitoJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
 }

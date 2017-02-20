@@ -65,6 +65,12 @@ public class AwsCognitoAutoConfiguration {
     @Bean
     public JwtAuthenticationProvider jwtAuthenticationProvider() { return new JwtAuthenticationProvider(); }
 
+
+    @Bean
+    public AwsCognitoJwtAuthenticationFilter awsCognitoJwtAuthenticationFilter() {
+        return new AwsCognitoJwtAuthenticationFilter(awsCognitoIdTokenProcessor());
+    }
+
     @Autowired
     private AwsCognitoJtwConfiguration awsCognitoJtwConfiguration;
 
