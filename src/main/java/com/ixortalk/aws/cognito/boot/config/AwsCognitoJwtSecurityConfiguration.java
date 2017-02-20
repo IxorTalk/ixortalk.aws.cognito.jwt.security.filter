@@ -40,16 +40,7 @@ public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAda
 	private int order = 4;
 
 	@Autowired
-	private ApplicationContext context;
-
-	@Autowired
-	private AwsCognitoIdTokenProcessor awsCognitoIdTokenProcessor;
-
-	@Autowired
-	private AwsCognitoJtwConfiguration awsCognitoJtwConfiguration;
-
-	@Autowired
-	private JwtAuthenticationProvider jwtAuthenticationProvider;
+	private AwsCognitoJwtAuthenticationFilter awsCognitoJwtAuthenticationFilter;
 
 	@Override
 	public int getOrder() {
@@ -61,13 +52,10 @@ public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAda
 	}
 
 	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.authenticationProvider(jwtAuthenticationProvider);
-	}
-	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 
-		http
+		http.headers().cacheControl();
+		http.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/health").permitAll()
 				.antMatchers("/v2/**").permitAll()
@@ -76,12 +64,8 @@ public class AwsCognitoJwtSecurityConfiguration extends WebSecurityConfigurerAda
 				.antMatchers("/**").permitAll() // needs to be the last matcher, otherwise all matchers following it would never be reached
 				.anyRequest().authenticated()
 				.and()
-				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+				.addFilterBefore(awsCognitoJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
-	private AwsCognitoJwtAuthenticationFilter jwtAuthenticationFilter() {
-
-		return new AwsCognitoJwtAuthenticationFilter(awsCognitoIdTokenProcessor);
-	}
 
 }
