@@ -38,7 +38,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 
@@ -49,7 +48,6 @@ import static com.nimbusds.jose.JWSAlgorithm.RS256;
 
 @Configuration
 @ConditionalOnClass({AwsCognitoJwtAuthenticationFilter.class, AwsCognitoIdTokenProcessor.class})
-@Import({AwsCognitoJwtSecurityConfiguration.class})
 @EnableConfigurationProperties({AwsCognitoJtwConfiguration.class})
 public class AwsCognitoAutoConfiguration {
 
