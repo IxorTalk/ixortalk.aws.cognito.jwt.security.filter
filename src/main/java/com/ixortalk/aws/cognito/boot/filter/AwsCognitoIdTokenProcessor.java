@@ -24,10 +24,8 @@
 package com.ixortalk.aws.cognito.boot.filter;
 
 import com.ixortalk.aws.cognito.boot.JwtAuthentication;
-import com.ixortalk.aws.cognito.boot.config.AwsCognitoCredentialsHolder;
-import com.ixortalk.aws.cognito.boot.config.AwsCognitoJtwConfiguration;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.proc.BadJOSEException;
+import com.ixortalk.aws.cognito.boot.config.JwtIdTokenCredentialsHolder;
+import com.ixortalk.aws.cognito.boot.config.JwtConfiguration;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import org.apache.commons.logging.Log;
@@ -39,72 +37,70 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import javax.servlet.http.HttpServletRequest;
-import java.text.ParseException;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AwsCognitoIdTokenProcessor {
 
-    protected final Log logger = LogFactory.getLog(getClass());
+    private static final Log logger = LogFactory.getLog(AwsCognitoIdTokenProcessor.class);
 
-    public static final String EMPTY_PWD = "";
-
-    @Autowired
-    private AwsCognitoJtwConfiguration awsCognitoJtwConfiguration;
+    private static final String ROLE_PREFIX = "ROLE_";
+    private static final String EMPTY_PWD = "";
 
     @Autowired
-    private ConfigurableJWTProcessor jwtProcessor;
+    private JwtConfiguration jwtConfiguration;
 
     @Autowired
-    private AwsCognitoCredentialsHolder awsCognitoCredentialsHolder;
+    private ConfigurableJWTProcessor configurableJWTProcessor;
+
+    @Autowired
+    private JwtIdTokenCredentialsHolder jwtIdTokenCredentialsHolder;
 
     public Authentication getAuthentication(HttpServletRequest request) throws Exception {
 
-        String idToken = request.getHeader(awsCognitoJtwConfiguration.getHttpHeader());
+        String idToken = request.getHeader(jwtConfiguration.getHttpHeader());
         if (idToken != null) {
 
             JWTClaimsSet claimsSet = null;
-            try {
 
-                claimsSet = jwtProcessor.process(idToken, null);
+            claimsSet = configurableJWTProcessor.process(idToken, null);
 
-                if (!claimsSet.getIssuer().equals(awsCognitoJtwConfiguration.getCognitoIdentityPoolUrl())) {
-                    throw new Exception(String.format("Issuer %s in JWT token doesn't match cognito idp %s", claimsSet.getIssuer(), awsCognitoJtwConfiguration.getCognitoIdentityPoolUrl()));
-                }
+            if (!isIssuedCorrectly(claimsSet)) {
+                throw new Exception(String.format("Issuer %s in JWT token doesn't match cognito idp %s", claimsSet.getIssuer(), jwtConfiguration.getCognitoIdentityPoolUrl()));
+            }
 
-                if (!claimsSet.getClaim("token_use").equals("id")) {
-                    throw new Exception("JWT Token doesn't seem to be an ID Token");
-                }
+            if (!isIdToken(claimsSet)) {
+                throw new Exception("JWT Token doesn't seem to be an ID Token");
+            }
 
-                String username = claimsSet.getClaims().get(awsCognitoJtwConfiguration.getUserNameField()).toString();
-                List<String> cognitoGroups = (List<String>) claimsSet.getClaims().get(awsCognitoJtwConfiguration.getGroupsField());
+            String username = claimsSet.getClaims().get(jwtConfiguration.getUserNameField()).toString();
 
-                if (username != null) {
+            if (username != null) {
 
-                    List<GrantedAuthority> grantedAuthorities = convertList(cognitoGroups, group -> new SimpleGrantedAuthority("ROLE_" + group.toUpperCase()));
-                    User user = new User(username, EMPTY_PWD, grantedAuthorities);
+                List<String> groups = (List<String>) claimsSet.getClaims().get(jwtConfiguration.getGroupsField());
+                List<GrantedAuthority> grantedAuthorities = convertList(groups, group -> new SimpleGrantedAuthority(ROLE_PREFIX + group.toUpperCase()));
+                User user = new User(username, EMPTY_PWD, grantedAuthorities);
 
-                    awsCognitoCredentialsHolder.setIdToken(idToken);
-                    return new JwtAuthentication(user,claimsSet,grantedAuthorities);
-                }
-
-
-            } catch (ParseException e) {
-                logger.error("Error parsing JWT Token",e);
-            } catch (BadJOSEException e) {
-                logger.error("JWT Token Signing and Encryption error",e);
-            } catch (JOSEException e) {
-                logger.error("JWT Token Signing and Encryption error",e);
+                jwtIdTokenCredentialsHolder.setIdToken(idToken);
+                return new JwtAuthentication(user, claimsSet, grantedAuthorities);
             }
 
         }
 
-        logger.warn("No idToken found in HTTP Header");
+        logger.trace("No idToken found in HTTP Header");
         return null;
     }
 
-    public static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
+    private boolean isIssuedCorrectly(JWTClaimsSet claimsSet) {
+        return claimsSet.getIssuer().equals(jwtConfiguration.getCognitoIdentityPoolUrl());
+    }
+
+    private boolean isIdToken(JWTClaimsSet claimsSet) {
+        return claimsSet.getClaim("token_use").equals("id");
+    }
+
+    private static <T, U> List<U> convertList(List<T> from, Function<T, U> func) {
         return from.stream().map(func).collect(Collectors.toList());
     }
 }

@@ -21,43 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.aws.cognito.boot;
-
-import com.nimbusds.jwt.JWTClaimsSet;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
-
-import java.util.Collection;
+package com.ixortalk.aws.cognito.boot.config;
 
 /**
  *
- * Value object holding the principal, the JWT clailmset and the granted authorities.
- * This is the authentication object that will be made available in the security context.
+ * Request scoped bean that holds the IDToken associated with the user.
  *
  */
-public class JwtAuthentication extends AbstractAuthenticationToken {
+public class JwtIdTokenCredentialsHolder {
 
-    private final Object principal;
-    private JWTClaimsSet jwtClaimsSet;
-
-    public JwtAuthentication(Object principal, JWTClaimsSet jwtClaimsSet, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
-        this.principal = principal;
-        this.jwtClaimsSet = jwtClaimsSet;
-        super.setAuthenticated(true);
+    public String getIdToken() {
+        return idToken;
     }
 
-    @Override
-    public Object getCredentials() {
-        return null;
+    public JwtIdTokenCredentialsHolder setIdToken(String idToken) {
+        this.idToken = idToken;
+        return this;
     }
 
-    @Override
-    public Object getPrincipal() {
-        return principal;
-    }
+    private String idToken;
 
-    public JWTClaimsSet getJwtClaimsSet() {
-        return jwtClaimsSet;
-    }
 }

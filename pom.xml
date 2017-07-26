@@ -24,14 +24,12 @@
     SOFTWARE.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.ixortalk</groupId>
     <artifactId>ixortalk.aws.cognito.jwt.security.filter</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.5-SNAPSHOT</version>
 
     <name>ixortalk.aws.cognito.jwt.security.filter</name>
     <description>Spring Boot Security Filter for verifying an AWS Cognito JWT token</description>
@@ -40,13 +38,26 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>1.4.3.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <scm>
-        <connection>scm:git:git@github.com:IxorTalk/ixortalk.aws.cognito.jwt.security.filter.git</connection>
+        <connection>scm:git:git@bitbucket.org:ixorcvba/ixortalk.aws.cognito.jwt.security.filter.git</connection>
         <tag>HEAD</tag>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>ixor</id>
+            <name>ixor-releases</name>
+            <url>http://repo.ixor.be/nexus/content/repositories/ixor-releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>ixor</id>
+            <name>ixor-snapshots</name>
+            <url>http://repo.ixor.be/nexus/content/repositories/ixor-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -71,6 +82,11 @@
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>4.23</version>
+        </dependency>
+        <dependency>
+            <groupId>net.minidev</groupId>
+            <artifactId>json-smart</artifactId>
+            <version>2.2.1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

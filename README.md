@@ -1,37 +1,70 @@
 ## Introduction
 
-Spring Boot security filter, capable of 
+This Spring Boot auto configuration module offers a security filter, capable of 
 
 - Decoding an AWS Cognito JWT idToken
-- Verifying the signature
-- Verifying the issuer
-- Create a principal object using the username contained in the JWT token
-- Convert the cognito groups into SimpleGrantedAuthorities
+- Verifying the JWT token signature
+- Verifying the JWT token issuer
+- Creating a principal object using the username contained in the JWT token
+- Convert the associated cognito groups into SimpleGrantedAuthorities
+
+This modules aim to bridge the gap between Cognito identities and Spring Boot Security Principals.
 
 ## Usage
 
-Annotate your Spring Boot application with the `@AwsCognitoJwtVerifier` annotation.
+
+### Security Configuration class
+Create a security configuration, inject the AwsCognitoJwtAuthenticationFilter and add it to the filterchain.
 
 ```
-package com.example;
+@Configuration
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter implements Ordered {
 
-import com.ixortalk.aws.cognito.boot.AwsCognitoJwtVerifier;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+	private int order = 4;
 
-@SpringBootApplication(scanBasePackages = { "com.example","com.ixortalk" })
-@AwsCognitoJwtVerifier
-public class SampleApp {
+	@Autowired
+	private AwsCognitoJwtAuthenticationFilter awsCognitoJwtAuthenticationFilter;
 
-	public static void main(String[] args) {
-		SpringApplication.run(SampleApp.class, args);
+	@Override
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
+	}
+
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+
+		http.headers().cacheControl();
+		http.csrf().disable()
+				.authorizeRequests()
+				.antMatchers("/health").permitAll()
+				.antMatchers("/v2/**").permitAll()
+				.antMatchers("/docs/**").permitAll()
+				.antMatchers("/api/**").authenticated()
+				.antMatchers("/**").permitAll() // needs to be the last matcher, otherwise all matchers following it would never be reached
+				.anyRequest().authenticated()
+				.and()
+				.addFilterBefore(awsCognitoJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
 }
 ```
 
+
 This will add a security filter to your spring boot app that will look for a base64 encoded JWT idToken in the `Authorization` header of the request.
+
+### Security Configuration Properties
+
+In order to be able to verify and decode JWT Tokens, the module needs some Cognito configuration. This includes
+
+- userPoolId
+- identityPoolId
+- region
+
+
 
 Add the following configuration to your application to give the verifier sufficient information to decode the JWT token:
 

@@ -1,0 +1,16 @@
+{
+  "sub": "e7308413-071f-425d-988c-c09c9e30ee65",
+  "aud": "1jjvr94p2tioj6ujn232jmip55",
+  "cognito:groups": [
+    "role1"
+  ],
+  "email_verified": true,
+  "token_use": "id",
+  "auth_time": 1486814985,
+  "iss": "https://cognito-idp.us-west-2.amazonaws.com/us-west-1_xxxxxxxxx",
+  "cognito:username": "role1@someone.com",
+  "exp": 1486828585,
+  "iat": 1486814985,
+  "custom:organizationId": "1",
+  "email": "role1@someone.com"
+}

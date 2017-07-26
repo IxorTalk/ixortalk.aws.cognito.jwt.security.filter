@@ -21,43 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.ixortalk.aws.cognito.boot;
+package com.ixortalk.aws.cognito.boot.filter.util;
 
-import com.nimbusds.jwt.JWTClaimsSet;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import org.apache.commons.io.IOUtils;
 
-import java.util.Collection;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
-/**
- *
- * Value object holding the principal, the JWT clailmset and the granted authorities.
- * This is the authentication object that will be made available in the security context.
- *
- */
-public class JwtAuthentication extends AbstractAuthenticationToken {
+public class FileUtil {
 
-    private final Object principal;
-    private JWTClaimsSet jwtClaimsSet;
-
-    public JwtAuthentication(Object principal, JWTClaimsSet jwtClaimsSet, Collection<? extends GrantedAuthority> authorities) {
-        super(authorities);
-        this.principal = principal;
-        this.jwtClaimsSet = jwtClaimsSet;
-        super.setAuthenticated(true);
+    public static String jsonFile(final String fileName) {
+        return fileContent("json", fileName);
     }
 
-    @Override
-    public Object getCredentials() {
-        return null;
+    public static String fileContent(final String dirPrefix, final String fileName) {
+        String name = null;
+        try {
+            name = dirPrefix + "/" + fileName;
+            return IOUtils.toString(FileUtil.class.getClassLoader().getResourceAsStream(name), UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Error reading file " + name + ": " + e.getMessage(), e);
+        }
     }
 
-    @Override
-    public Object getPrincipal() {
-        return principal;
-    }
-
-    public JWTClaimsSet getJwtClaimsSet() {
-        return jwtClaimsSet;
-    }
 }
