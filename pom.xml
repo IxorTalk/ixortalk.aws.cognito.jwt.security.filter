@@ -33,6 +33,7 @@
 
     <name>ixortalk.aws.cognito.jwt.security.filter</name>
     <description>Spring Boot Security Filter for verifying an AWS Cognito JWT token</description>
+    <url>https://github.com/ixortalk/ixortalk.aws.cognito.jwt.security.filter/tree/master</url>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -41,29 +42,61 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
-    <scm>
-        <connection>scm:git:git@bitbucket.org:ixorcvba/ixortalk.aws.cognito.jwt.security.filter.git</connection>
-        <tag>HEAD</tag>
-    </scm>
-
-    <distributionManagement>
-        <repository>
-            <id>ixor</id>
-            <name>ixor-releases</name>
-            <url>http://repo.ixor.be/nexus/content/repositories/ixor-releases</url>
-        </repository>
-        <snapshotRepository>
-            <id>ixor</id>
-            <name>ixor-snapshots</name>
-            <url>http://repo.ixor.be/nexus/content/repositories/ixor-snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
     </properties>
+
+    <organization>
+        <name>IxorTalk CVBA</name>
+        <url>https://ixortalk.com</url>
+    </organization>
+    <licenses>
+        <license>
+            <name>The MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>ddewaele</id>
+            <name>Davy De Waele</name>
+            <email>davy.dewaele at ixortalk.com</email>
+            <organization>IxorTalk CVBA</organization>
+            <organizationUrl>https://ixortalk.com</organizationUrl>
+            <roles>
+                <role>Project lead</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>wjans</id>
+            <name>Ward Jans</name>
+            <email>ward.jans at ixortalk.com</email>
+            <organization>IxorTalk CVBA</organization>
+            <organizationUrl>https://ixortalk.com</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:ixortalk/ixortalk.aws.cognito.jwt.security.filter.git</connection>
+        <developerConnection>scm:git:git@github.com:ixortalk/ixortalk.aws.cognito.jwt.security.filter.git</developerConnection>
+        <url>https://github.com/ixortalk/ixortalk.aws.cognito.jwt.security.filter/tree/master</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
