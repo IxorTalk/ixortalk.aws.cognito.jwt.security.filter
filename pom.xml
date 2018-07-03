@@ -29,7 +29,7 @@
 
     <groupId>com.ixortalk</groupId>
     <artifactId>ixortalk.aws.cognito.jwt.security.filter</artifactId>
-    <version>0.0.5-SNAPSHOT</version>
+    <version>0.0.6-SNAPSHOT</version>
 
     <name>ixortalk.aws.cognito.jwt.security.filter</name>
     <description>Spring Boot Security Filter for verifying an AWS Cognito JWT token</description>
