@@ -47,6 +47,7 @@ public class AwsCognitoIdTokenProcessor {
 
     private static final String ROLE_PREFIX = "ROLE_";
     private static final String EMPTY_PWD = "";
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @Autowired
     private JwtConfiguration jwtConfiguration;
@@ -64,7 +65,7 @@ public class AwsCognitoIdTokenProcessor {
 
             JWTClaimsSet claimsSet = null;
 
-            claimsSet = configurableJWTProcessor.process(idToken, null);
+            claimsSet = configurableJWTProcessor.process(stripBearerToken(idToken), null);
 
             if (!isIssuedCorrectly(claimsSet)) {
                 throw new Exception(String.format("Issuer %s in JWT token doesn't match cognito idp %s", claimsSet.getIssuer(), jwtConfiguration.getCognitoIdentityPoolUrl()));
@@ -90,6 +91,10 @@ public class AwsCognitoIdTokenProcessor {
 
         logger.trace("No idToken found in HTTP Header");
         return null;
+    }
+
+    private String stripBearerToken(String token) {
+        return token.startsWith(BEARER_PREFIX) ? token.substring(BEARER_PREFIX.length()) : token;
     }
 
     private boolean isIssuedCorrectly(JWTClaimsSet claimsSet) {
