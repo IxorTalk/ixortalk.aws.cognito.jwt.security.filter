@@ -12,8 +12,27 @@ This modules aim to bridge the gap between Cognito identities and Spring Boot Se
 
 ## Usage
 
+### Maven Dependency
+
+The module is made available via Maven Central and is currently at version 0.0.6.
+It can be added to your Maven based project like this :
+
+```
+<dependency>
+    <groupId>com.ixortalk</groupId>
+    <artifactId>ixortalk.aws.cognito.jwt.security.filter</artifactId>
+    <version>0.0.6</version>
+</dependency> 
+```
+
+or when using Gradle :
+
+```
+compile 'com.ixortalk:ixortalk.aws.cognito.jwt.security.filter:0.0.6'
+```
 
 ### Security Configuration class
+
 Create a security configuration, inject the AwsCognitoJwtAuthenticationFilter and add it to the filterchain.
 
 ```
