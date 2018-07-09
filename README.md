@@ -73,7 +73,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter implemen
 ```
 
 
-This will add a security filter to your spring boot app that will look for a base64 encoded JWT idToken in the `Authorization` header of the request.
+This will add a security filter to your spring boot app that will look for a JWT idToken in the `Authorization` header of the request.
 
 ### Security Configuration Properties
 
