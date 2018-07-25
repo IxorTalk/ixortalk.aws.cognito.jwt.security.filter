@@ -21,14 +21,14 @@ It can be added to your Maven based project like this :
 <dependency>
     <groupId>com.ixortalk</groupId>
     <artifactId>ixortalk.aws.cognito.jwt.security.filter</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
 </dependency> 
 ```
 
 or when using Gradle :
 
 ```
-compile 'com.ixortalk:ixortalk.aws.cognito.jwt.security.filter:0.0.6'
+compile 'com.ixortalk:ixortalk.aws.cognito.jwt.security.filter:0.0.7'
 ```
 
 ### Security Configuration class
@@ -84,7 +84,6 @@ In order to be able to verify and decode JWT Tokens, the module needs some Cogni
 - region
 
 
-
 Add the following configuration to your application to give the verifier sufficient information to decode the JWT token:
 
 ```
@@ -96,8 +95,15 @@ com:
             userPoolId: "us-west-2_abcdefghi"
             identityPoolId: "us-west-2:xxxxxxxx-aaaa-bbbb-ccc-dddddddddddd"
             region: "us-west-2"
-```            
+```
 
+## HTTP call
+
+To call a secure endpoint with a JWT token, add the authorization header with the Bearer type, followed by the actual token.
+
+```
+curl -v -H "Authorization: Bearer $TOKEN" http://localhost:8080/api/secure | jq
+```
 
 ## License
 
