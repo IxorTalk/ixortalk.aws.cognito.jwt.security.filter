@@ -29,7 +29,7 @@
 
     <groupId>com.ixortalk</groupId>
     <artifactId>ixortalk.aws.cognito.jwt.security.filter</artifactId>
-    <version>0.0.7</version>
+    <version>0.0.8-SNAPSHOT</version>
 
     <name>ixortalk.aws.cognito.jwt.security.filter</name>
     <description>Spring Boot Security Filter for verifying an AWS Cognito JWT token</description>
@@ -84,7 +84,7 @@
         <connection>scm:git:git@github.com:ixortalk/ixortalk.aws.cognito.jwt.security.filter.git</connection>
         <developerConnection>scm:git:git@github.com:ixortalk/ixortalk.aws.cognito.jwt.security.filter.git</developerConnection>
         <url>https://github.com/ixortalk/ixortalk.aws.cognito.jwt.security.filter/tree/master</url>
-        <tag>ixortalk.aws.cognito.jwt.security.filter-0.0.7</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
