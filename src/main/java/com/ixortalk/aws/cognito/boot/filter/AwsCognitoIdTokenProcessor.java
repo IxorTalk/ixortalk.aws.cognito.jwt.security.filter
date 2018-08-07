@@ -83,7 +83,7 @@ public class AwsCognitoIdTokenProcessor {
                 List<GrantedAuthority> grantedAuthorities = convertList(groups, group -> new SimpleGrantedAuthority(ROLE_PREFIX + group.toUpperCase()));
                 User user = new User(username, EMPTY_PWD, grantedAuthorities);
 
-                jwtIdTokenCredentialsHolder.setIdToken(idToken);
+                jwtIdTokenCredentialsHolder.setIdToken(stripBearerToken(idToken));
                 return new JwtAuthentication(user, claimsSet, grantedAuthorities);
             }
 
