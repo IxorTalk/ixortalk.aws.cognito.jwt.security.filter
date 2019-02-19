@@ -81,7 +81,7 @@ public class AwsCognitoIdTokenProcessor {
             if (username != null) {
 
                 List<String> groups = (List<String>) claimsSet.getClaims().get(jwtConfiguration.getGroupsField());
-                List<GrantedAuthority> grantedAuthorities = groups == null ? Collections.EMPTY_LIST : convertList(groups, group -> new SimpleGrantedAuthority(ROLE_PREFIX + group.toUpperCase()));
+                List<GrantedAuthority> grantedAuthorities = groups == null ? Collections.emptyList() : convertList(groups, group -> new SimpleGrantedAuthority(ROLE_PREFIX + group.toUpperCase()));
                 User user = new User(username, EMPTY_PWD, grantedAuthorities);
 
                 jwtIdTokenCredentialsHolder.setIdToken(stripBearerToken(idToken));
