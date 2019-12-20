@@ -135,6 +135,12 @@ public class AwsCognitoIdTokenProcessorTest {
         awsCognitoIdTokenProcessor.getAuthentication(request);
     }
 
+    @Test
+    public void whenUserHasNoRoles() throws Exception {
+        request.addHeader("Authorization", newJwtToken(KNOWN_KID,"norole").serialize());
+        Authentication authentication =  awsCognitoIdTokenProcessor.getAuthentication(request);
+        assertThat(authentication.isAuthenticated()).isTrue();
+    }
 
     protected void setupJwkResource(String assetResponse) {
         wireMockRule.stubFor(get(urlEqualTo("/.well-known/jwks.json"))
